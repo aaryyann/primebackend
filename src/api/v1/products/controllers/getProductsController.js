@@ -1,12 +1,32 @@
+const { productModel } = require('../../../../models/productsSchema')
 const { readData } = require('../services/readData')
 
 const getProductsController = async (req , res) => {
-    console.log("Request Received");
+
+    const {query = 1 , limit = 6 , search = ""} = req.query
+    
+
+    let mongooseQuery = productModel.find({})
+
+    const regexmatch = new RegExp(search , 'i')
+
+    mongooseQuery.where('title').regex(regexmatch)
+    const queryClone = mongooseQuery.clone()
+
+    const productList = await mongooseQuery
+    
+    const totalProduct = await queryClone.countDocuments()
+
+    mongooseQuery = mongooseQuery.sort("_id").skip((query-1)*limit)
+    mongooseQuery = mongooseQuery.sort("_id").limit(limit)
+
 
     res.status(200).json({
-        status : "GET",
-        data : "Working on it"
-    });
+        productList,
+        query , 
+        limit , 
+        totalProduct
+    })
 }
 
 module.exports = {
