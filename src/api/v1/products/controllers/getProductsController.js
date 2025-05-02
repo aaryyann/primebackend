@@ -1,3 +1,4 @@
+const { rejects } = require('assert')
 const { productModel } = require('../../../../models/productsSchema')
 const { readData } = require('../services/readData')
 
@@ -20,7 +21,11 @@ const getProductsController = async (req , res) => {
     mongooseQuery = mongooseQuery.sort("_id").skip((query-1)*limit)
     mongooseQuery = mongooseQuery.sort("_id").limit(limit)
 
-
+    await new Promise((resolve , reject) => {
+        setTimeout(() => {
+            resolve()
+        } , 5000)
+    })
     res.status(200).json({
         productList,
         query , 
